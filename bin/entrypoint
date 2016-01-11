@@ -28,4 +28,4 @@ echo "$BACKUP_WINDOW /backup/bin/cron-job >> /var/log/cron.log 2>&1" >> job;
 echo "" >> job
 crontab job;
 crond
-exec tail -f /var/log/cron.log;
+tail -f /var/log/cron.log;
