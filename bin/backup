@@ -1,0 +1,14 @@
+#!/bin/bash
+
+DATETIME=`date +"%Y-%m-%d_%H"`
+FILE=$FILENAME-$DATETIME
+
+mysqldump -h $MYSQL_HOST -P $MYSQL_PORT -u $MYSQL_USER -p$MYSQL_PASSWORD $DB_NAME > $FILE.sql
+gzip -9 $FILE.sql
+aws s3 cp $FILE.sql.gz --region=$REGION  s3://$BUCKET
+
+if  [ "$?" != "0" ]; then
+    echo "Error occurred in database dump process. Exiting now"
+fi
+
+rm $FILE.sql.gz

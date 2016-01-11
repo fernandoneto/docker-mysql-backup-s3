@@ -1,0 +1,24 @@
+#!/bin/bash
+
+if [ "$1" == "" ]; then
+    echo "You did not choose any file to download;"
+    echo "EX: restore backup-201501.sql"
+    exit 1
+fi
+
+# Create database and grant permissions
+echo "DROP DATABASE IF EXISTS ${DB_NAME}; CREATE DATABASE ${DB_NAME}; GRANT ALL PRIVILEGES ON *.* TO '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}' WITH GRANT OPTION; FLUSH PRIVILEGES;" | mysql -h $MYSQL_HOST --port=$MYSQL_PORT -u ''"$MYSQL_USER"'' --password=$MYSQL_PASSWORD
+
+aws s3 cp --region=$REGION s3://$BUCKET/$1 $1
+gzip -d $1
+
+# Filter the database
+DB_FILE=$(ls | grep *.sql)
+
+mysql -h $MYSQL_HOST -P $MYSQL_PORT --user=$MYSQL_USER --password=$MYSQL_PASSWORD $DB_NAME < $DB_FILE
+
+rm -fR $DB_FILE
+
+if [ "$?" != "0" ]; then
+  echo "Restoring process fail"
+fi

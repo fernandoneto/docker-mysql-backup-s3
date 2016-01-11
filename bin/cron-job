@@ -1,0 +1,31 @@
+#!/bin/bash
+
+DATETIME=`date +"%Y-%m-%d_%H_%M"`
+
+make_backup () {
+
+    export AWS_ACCESS_KEY_ID={{AWS_ACCESS_KEY_ID}}
+    export AWS_SECRET_ACCESS_KEY={{AWS_SECRET_ACCESS_KEY}}
+    export BUCKET={{BUCKET}}
+    export REGION={{REGION}}
+    export MYSQL_HOST={{MYSQL_HOST}}
+    export MYSQL_PORT={{MYSQL_PORT}}
+    export MYSQL_USER={{MYSQL_USER}}
+    export MYSQL_PASSWORD={{MYSQL_PASSWORD}}
+    export DB_NAME={{DB_NAME}}
+    export FILE={{FILENAME}}$DATETIME
+
+    mysqldump -h $MYSQL_HOST -P $MYSQL_PORT -u $MYSQL_USER -p$MYSQL_PASSWORD $DB_NAME > $FILE.sql
+    gzip -9 $FILE.sql
+    aws s3 cp $FILE.sql.gz --region=$REGION  s3://$BUCKET
+
+    # exit if last command have problems
+    if  [ "$?" != "0" ]; then
+        echo "Error occurred in backup process. Exiting now"
+    fi
+
+    rm -fR *.sql.gz
+
+}
+
+make_backup

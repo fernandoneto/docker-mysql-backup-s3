@@ -1,0 +1,31 @@
+#!/bin/bash
+
+if [ "$MYSQL_PORT" == "" ]; then
+    export MYSQL_PORT="3306";
+fi
+
+if [ "$FILENAME" == "" ]; then
+    export FILENAME="backup";
+fi
+
+if [ "$BACKUP_WINDOW" == "" ]; then
+    BACKUP_WINDOW="0 6 * * * ";
+fi
+
+sed 's,{{FILENAME}},'"${FILENAME}"',g' -i /backup/bin/cron-job
+sed 's,{{AWS_ACCESS_KEY_ID}},'"${AWS_ACCESS_KEY_ID}"',g' -i /backup/bin/cron-job
+sed 's,{{AWS_SECRET_ACCESS_KEY}},'"${AWS_SECRET_ACCESS_KEY}"',g' -i /backup/bin/cron-job
+sed 's,{{BUCKET}},'"${BUCKET}"',g' -i /backup/bin/cron-job
+sed 's,{{REGION}},'"${REGION}"',g' -i /backup/bin/cron-job
+sed 's,{{MYSQL_HOST}},'"${MYSQL_HOST}"',g' -i /backup/bin/cron-job
+sed 's,{{MYSQL_PORT}},'"${MYSQL_PORT}"',g' -i /backup/bin/cron-job
+sed 's,{{MYSQL_USER}},'"${MYSQL_USER}"',g' -i /backup/bin/cron-job
+sed 's,{{MYSQL_PASSWORD}},'"${MYSQL_PASSWORD}"',g' -i /backup/bin/cron-job
+sed 's,{{DB_NAME}},'"${DB_NAME}"',g' -i /backup/bin/cron-job
+
+touch /var/log/cron.log;
+echo "$BACKUP_WINDOW /backup/bin/cron-job >> /var/log/cron.log 2>&1" >> job;
+echo "" >> job
+crontab job;
+crond
+exec tail -f /var/log/cron.log;
