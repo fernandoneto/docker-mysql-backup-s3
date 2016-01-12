@@ -5,15 +5,16 @@ container to backup and restore your mysql database's to using awscli.
 # Container startup explained
 
 * This container user cron to make backups
-* Mysql will acess to the host where is database you want to backup
 * Mysql will dump the database to this container and compress it using gzip
 * Using s3cli the file will be uploaded to S3 Storage
-* To restore a db just enter the container and run the 'restore' script ewithe the file name to restore;
+* To restore a db just enter the container and run the 'restore' script with the file name to restore:
 
   ```bash
   ./restore example.sql.gz
   ```
-* To run a manual backup just enter the container and run;
+
+* To run a manual backup just enter the container and run:
+
   ```bash
   ./backup
   ```
