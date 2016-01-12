@@ -12,4 +12,6 @@ RUN mkdir -p /backup
 ADD . /backup
 RUN chmod +x /backup/bin/*
 
+WORKDIR /backup/bin/
+
 ENTRYPOINT ["/backup/bin/entrypoint"]
