@@ -2,17 +2,13 @@
 
 if [ "$1" == "" ]; then
     echo "You did not choose any file to download;"
-    echo "EX: restore backup-201501.sql.gz"
-    exit 1
+    echo "EX: ./restore backup-201501.sql.gz"
 fi
 
 # Create database and grant permissions
 echo "DROP DATABASE IF EXISTS ${DB_NAME}; CREATE DATABASE ${DB_NAME}; GRANT ALL PRIVILEGES ON *.* TO '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}' WITH GRANT OPTION; FLUSH PRIVILEGES;" | mysql -h $MYSQL_HOST --port=$MYSQL_PORT -u ''"$MYSQL_USER"'' --password=$MYSQL_PASSWORD
 
-aws s3 cp --region=$REGION s3://$BUCKET/$1 $1
-gzip -dc < $1 | mysql -h $MYSQL_HOST -P $MYSQL_PORT --user=$MYSQL_USER --password=$MYSQL_PASSWORD $DB_NAME
-
-rm -fR $DB_FILE
+aws s3 cp --region=$REGION s3://$BUCKET/$1 - | gzip -dc | mysql -h $MYSQL_HOST -P $MYSQL_PORT --user=$MYSQL_USER --password=$MYSQL_PASSWORD $DB_NAME
 
 if [ "$?" != "0" ]; then
   echo "Restoring process fail"

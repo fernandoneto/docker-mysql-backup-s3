@@ -16,7 +16,7 @@ make_backup () {
     DB_NAME={{DB_NAME}}
     FILE={{FILENAME}}-$DATETIME.sql.gz
 
-    mysqldump -h $MYSQL_HOST -P $MYSQL_PORT -u $MYSQL_USER -p$MYSQL_PASSWORD $DB_NAME | gzip -9 -c > $FILE | aws s3 cp $FILE --region=$REGION  s3://$BUCKET
+    mysqldump -h $MYSQL_HOST -P $MYSQL_PORT -u $MYSQL_USER -p$MYSQL_PASSWORD $DB_NAME | gzip -9 -c  | aws s3 cp - --region=$REGION  s3://$BUCKET/$FILE
 
     # exit if last command have problems
     if  [ "$?" == "0" ]; then
@@ -25,8 +25,6 @@ make_backup () {
         echo "Error occurred in backup process. Exiting now"
         kill -9 $PID
     fi
-
-    rm -fR $FILE
 
 }
 

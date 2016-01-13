@@ -1,16 +1,8 @@
 #!/bin/bash
 
-if [ "$MYSQL_PORT" == "" ]; then
-    export MYSQL_PORT="3306";
-fi
-
-if [ "$FILENAME" == "" ]; then
-    export FILENAME="backup";
-fi
-
-if [ "$BACKUP_WINDOW" == "" ]; then
-    BACKUP_WINDOW="0 6 * * * ";
-fi
+MYSQL_PORT=${MYSQL_PORT:-3306}
+FILENAME=${FILENAME:-backup}
+BACKUP_WINDOW=${BACKUP_WINDOW:-"0 6 * * * "}
 
 sed 's,{{FILENAME}},'"${FILENAME}"',g' -i /backup/bin/cron-job
 sed 's,{{AWS_ACCESS_KEY_ID}},'"${AWS_ACCESS_KEY_ID}"',g' -i /backup/bin/cron-job

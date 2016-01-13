@@ -1,12 +1,10 @@
 #!/bin/bash
 
-DATETIME=`date +"%Y-%m-%d_%H"`
+DATETIME=`date +"%Y-%m-%d_%H_%M"`
 FILE=$FILENAME-$DATETIME.sql.gz
 
-mysqldump -h $MYSQL_HOST -P $MYSQL_PORT -u $MYSQL_USER -p$MYSQL_PASSWORD $DB_NAME | gzip -9 -c > $FILE | aws s3 cp $FILE --region=$REGION  s3://$BUCKET
+mysqldump -h $MYSQL_HOST -P $MYSQL_PORT -u $MYSQL_USER -p$MYSQL_PASSWORD $DB_NAME | gzip -9 -c  | aws s3 cp - --region=$REGION  s3://$BUCKET/$FILE
 
 if  [ "$?" != "0" ]; then
     echo "Error occurred in database backup process. Exiting now"
 fi
-
-rm $FILE

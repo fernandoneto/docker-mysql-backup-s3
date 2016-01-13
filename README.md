@@ -46,7 +46,7 @@ docker run --rm --name mysql-backup \
   --env MYSQL_USER=root \
   --env MYSQL_PASSWORD=password \
   --env DB_NAME=mysql-db \
-  --env BACKUP_WINDOW=' 0 6 * * * ' \
+  --env BACKUP_WINDOW='0 6 * * *' \
   fernandoneto/docker-mysql-backup-s3
 
 ```
