@@ -18,6 +18,15 @@ sed 's,{{SLACK_TOKEN}},'"${SLACK_TOKEN}"',g' -i /backup/bin/cron-job
 sed 's,{{SLACK_CHANNEL}},'"${SLACK_CHANNEL}"',g' -i /backup/bin/cron-job
 
 touch /var/log/cron.log;
-crontab -l | { cat; echo "$BACKUP_WINDOW /backup/bin/cron-job >> /var/log/cron.log 2>&1"; } | crontab -
+
+# prevent duplicate jobs when restart containers
+if [ ! -f /home/.cronjob ]; then
+
+    crontab -l | { cat; echo "$BACKUP_WINDOW /backup/bin/cron-job >> /var/log/cron.log 2>&1"; } | crontab -
+    touch /home/.cronjob
+
+fi
+
+# run cron in background and show the output 
 crond;
 tail -f /var/log/cron.log;
